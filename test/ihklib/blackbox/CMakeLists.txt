@@ -571,9 +571,11 @@ if(CPU_MODEL STREQUAL "a64fx")
 endif()
 
 # kernel module
-add_custom_target(test_driver ALL COMMAND cp ${WITH_MCK}/kmod/ihk/linux/core/Module.symvers ./ && make EXTRA_CFLAGS=-I/${WITH_MCK}/include && mv test_driver.ko ${CMAKE_BINARY_DIR} && make clean
+execute_process(COMMAND find ${WITH_MCK}/../ -name Module.symvers
+  OUTPUT_VARIABLE SYMVERS OUTPUT_STRIP_TRAILING_WHITESPACE)
+add_custom_target(test_driver ALL COMMAND cp ${SYMVERS} ./ && make EXTRA_CFLAGS=-I/${WITH_MCK}/include && mv test_driver.ko ${CMAKE_BINARY_DIR} && make clean
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/driver
-)
+  )
 install(PROGRAMS ${CMAKE_BINARY_DIR}/test_driver.ko DESTINATION kmod)
 
 configure_file(driver/test_driver_insmod.sh.in test_driver_insmod.sh)
